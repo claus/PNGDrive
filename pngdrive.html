@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>PNGDrive</title>
+	<link rel="stylesheet" href="pngdrive.css" />
+	<script src="encoding.js"></script>
+	<script src="pngdrive.js"></script>
+</head>
+<body>
+
+<h1>PNGDrive</h1>
+
+<div id="file-drop-area">Drop files here</div>
+<div id="file-list"></div>
+<div id="file-info"></div>
+<div id="file-error"></div>
+<div id="image"></div>
+<div><a id="decode-result" href="#">decode</a></div>
+
+<script>
+
+	(function() {
+
+		var fileDropArea = document.getElementById("file-drop-area");
+		var fileList = document.getElementById("file-list");
+		var fileInfo = document.getElementById("file-info");
+		var fileError = document.getElementById("file-error");
+
+		document.getElementById("decode-result").addEventListener('click', decodeResultHandler);
+
+		var files = [];
+		var pngdrive = new PNGDrive();
+
+		if (window.File && window.FileReader && window.FileList && window.Blob) {
+			// Great success! All the File APIs are supported.
+			fileDropArea.addEventListener('dragover', handleDragOver, false);
+			fileDropArea.addEventListener('dragout', handleDragOut, false);
+			fileDropArea.addEventListener('drop', handleFileSelect, false);
+		} else {
+			fileDropArea.style.display = fileList.style.display = "none";
+			fileError.innerHTML = "File API not (or not fully) supported by this browser. Sadface.";
+			fileError.style.display = "block";
+		}
+
+		function handleFileSelect(event) {
+			event.stopPropagation();
+			event.preventDefault();
+			var fl = event.dataTransfer.files;
+			for (var i = 0, f; f = fl[i]; i++) {
+				pngdrive.addFile(f);
+				files.push(f);
+			}
+			update();
+			fileDropArea.style.backgroundColor = "transparent";
+		}
+
+		function handleDragOver(event) {
+			event.stopPropagation();
+			event.preventDefault();
+			event.dataTransfer.dropEffect = 'copy';
+			fileDropArea.style.backgroundColor = "#eee";
+		}
+
+		function handleDragOut(event) {
+			event.stopPropagation();
+			event.preventDefault();
+			fileDropArea.style.backgroundColor = "transparent";
+		}
+
+		function update() {
+			pngdrive.encode(function() {
+				var imgContainer = document.getElementById("image");
+				var img = this.getImgElement();
+				img.id = "result-image";
+				imgContainer.innerHTML = "";
+				imgContainer.appendChild(img);
+				var ul = "";
+				var contentSize = 0;
+				var numFiles = this.getFileCount();
+				for(var i = 0; i < numFiles; i++) {
+					var f = this.getFileAt(i);
+					ul += "<li data-index=\"" + i + "\"><strong>" + encodeURIComponent(f.name) +  "</strong>, " + f.content.byteLength + " bytes (" + (f.type || 'n/a') + ")</li>";
+					contentSize += f.content.byteLength;
+				}
+				fileList.innerHTML = "<ul>" + ul + "</ul>";
+				var px = this.getImgSize();
+				fileInfo.innerHTML = "Bitmap: " + px + "x" + px + " px<br>" +
+					"Content Size: " + contentSize + " bytes<br>" +
+					"Uncompressed Size: " + this.getUncompressedSize() + " bytes<br>" +
+					"Compressed Size: " + this.getCompressedSize() + " bytes<br>";
+			});
+		}
+
+		function decodeResultHandler(event) {
+			pngdrive.decode(document.getElementById("result-image"));
+		}
+
+	})();
+
+</script>
+</body>
+</html>

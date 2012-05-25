@@ -1,0 +1,19 @@
+body {
+    font: 12px black Helvetica, Arial, sans-serif;
+}
+#file-drop-area {
+    border: 2px dashed gray;
+    border-radius: 10px;
+    color: gray;
+    font-size: 14px;
+    padding: 20px;
+    text-align: center;
+}
+#file-error {
+    display: none;
+    border: 2px solid red;
+    color: red;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 12px;
+}
