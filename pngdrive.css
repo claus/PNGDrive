@@ -1,5 +1,6 @@
 body {
-    font: 12px black Helvetica, Arial, sans-serif;
+    font: 12px Helvetica, Arial, sans-serif;
+    padding: 20px
 }
 #file-drop-area {
     border: 2px dashed gray;
@@ -12,8 +13,28 @@ body {
 #file-error {
     display: none;
     border: 2px solid red;
-    color: red;
-    font-weight: bold;
     font-size: 14px;
     padding: 12px;
+}
+#file-error > p {
+    font-weight: bold;
+    color: red;
+    margin-top: 0;
+}
+#file-error li.win {
+    color: green;
+}
+#file-error li.fail {
+    color: red;
+}
+h1 {
+    margin: 0;
+}
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+div {
+    margin: 10px 0
 }
