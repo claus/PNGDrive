@@ -14,8 +14,7 @@ And here's Hamlet in a PNG:
 
 ### Preparation
 
-	<script src="encoding.js"></script>
-	<script src="pngdrive.js"></script>
+	<script src="lib/pngdrive-min.js"></script>
 
 ### Encode
 
