@@ -2,6 +2,17 @@ body {
     font: 12px Helvetica, Arial, sans-serif;
     padding: 20px
 }
+h1 {
+    margin: 0;
+}
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+div {
+    margin: 10px 0
+}
 #file-drop-area {
     border: 2px dashed gray;
     border-radius: 10px;
@@ -13,31 +24,20 @@ body {
 #decode-result {
     display: none;
 }
-#file-error {
+#error {
     display: none;
     border: 2px solid red;
     font-size: 14px;
     padding: 12px;
 }
-#file-error > p {
+#error > p {
     font-weight: bold;
     color: red;
     margin-top: 0;
 }
-#file-error li.win {
+#error li.win {
     color: green;
 }
-#file-error li.fail {
+#error li.fail {
     color: red;
-}
-h1 {
-    margin: 0;
-}
-ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-}
-div {
-    margin: 10px 0
 }

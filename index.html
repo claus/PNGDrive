@@ -17,9 +17,10 @@
 <p>PNGDrive.js is a JavaScript library to pack multiple files into a PNG. <a href="https://github.com/MadeInHaus/PNGDrive">Fork it on GitHub</a>.</p>
 
 <div id="file-drop-area">Drop files here</div>
+<div><input type="file" id="file-select" name="files[]" multiple /></div>
 <div id="file-list"></div>
 <div id="file-info"></div>
-<div id="file-error"></div>
+<div id="error"></div>
 <div id="image"></div>
 <div id="decode-result"><a id="decode-result-a" href="#">decode</a></div>
 
@@ -29,24 +30,25 @@
 	(function() {
 
 		var fileDropArea = document.getElementById("file-drop-area");
+		var fileSelect = document.getElementById("file-select");
 		var fileList = document.getElementById("file-list");
 		var fileInfo = document.getElementById("file-info");
-		var fileError = document.getElementById("file-error");
+		var error = document.getElementById("error");
 		var decodeResult = document.getElementById("decode-result");
+		var decodeResultA = document.getElementById("decode-result-a");
 
-		document.getElementById("decode-result-a").addEventListener('click', decodeResultHandler);
-
-		var files = [];
 		var pngdrive = new PNGDrive();
 
 		if (window.File && window.FileReader && window.FileList && window.Blob && window.atob && window.JSON) {
 			fileDropArea.addEventListener('dragover', handleDragOver, false);
-			fileDropArea.addEventListener('dragout', handleDragOut, false);
-			fileDropArea.addEventListener('drop', handleFileSelect, false);
+			fileDropArea.addEventListener('dragleave', handleDragLeave, false);
+			fileDropArea.addEventListener('drop', handleFileDrop, false);
+			fileSelect.addEventListener('change', handleFileSelect, false);
+			decodeResultA.addEventListener('click', handleDecode);
 		} else {
-			fileDropArea.style.display = fileList.style.display = "none";
-			fileError.style.display = "block";
-			var report = "<p>This demo requires some features that are not supported by this browser. Sadface.</p>";
+			fileDropArea.style.display = "none";
+			fileList.style.display = "none";
+			fileSelect.style.display = "none";
 			var li = "";
 			li += "<li class=\"" + (window.File ? "win" : "fail") +  "\">File: " + (window.File ? "supported" : "not supported") + "</li>";
 			li += "<li class=\"" + (window.FileReader ? "win" : "fail") +  "\">FileReader: " + (window.FileReader ? "supported" : "not supported") + "</li>";
@@ -54,35 +56,43 @@
 			li += "<li class=\"" + (window.Blob ? "win" : "fail") +  "\">Blob: " + (window.Blob ? "supported" : "not supported") + "</li>";
 			li += "<li class=\"" + (window.JSON ? "win" : "fail") +  "\">JSON: " + (window.JSON ? "supported" : "not supported") + "</li>";
 			li += "<li class=\"" + (window.atob ? "win" : "fail") +  "\">atob(): " + (window.atob ? "supported" : "not supported") + "</li>";
-			fileError.innerHTML = report + "<ul>" + li + "</ul><br>Try Chrome or Firefox.";
+			error.style.display = "block";
+			error.innerHTML =
+				"<p>This demo requires some features that are not supported by this browser. Sadface.</p>" +
+				"<ul>" + li + "</ul>" +
+				"<br>Try Chrome, Firefox or Opera.";
 		}
 
 		function handleFileSelect(event) {
-			event.stopPropagation();
+			var fl = event.target.files;
+			for (var i = 0, f; f = fl[i]; i++) {
+				pngdrive.addFile(f);
+			}
+			encode();
+		}
+
+		function handleFileDrop(event) {
 			event.preventDefault();
+			event.stopPropagation();
+			fileDropArea.style.backgroundColor = "transparent";
 			var fl = event.dataTransfer.files;
 			for (var i = 0, f; f = fl[i]; i++) {
 				pngdrive.addFile(f);
-				files.push(f);
 			}
-			update();
-			fileDropArea.style.backgroundColor = "transparent";
+			encode();
 		}
 
 		function handleDragOver(event) {
-			event.stopPropagation();
 			event.preventDefault();
-			event.dataTransfer.dropEffect = 'copy';
 			fileDropArea.style.backgroundColor = "#eee";
+			event.dataTransfer.dropEffect = 'copy';
 		}
 
-		function handleDragOut(event) {
-			event.stopPropagation();
-			event.preventDefault();
+		function handleDragLeave(event) {
 			fileDropArea.style.backgroundColor = "transparent";
 		}
 
-		function update() {
+		function encode() {
 			pngdrive.encode(function() {
 				var imgContainer = document.getElementById("image");
 				var img = this.getImgElement();
@@ -108,7 +118,8 @@
 			});
 		}
 
-		function decodeResultHandler(event) {
+		function handleDecode(event) {
+			event.preventDefault();
 			pngdrive.decode(document.getElementById("result-image"));
 			var numFiles = pngdrive.getFileCount();
 			console.log("Files: " + numFiles + ", ",
