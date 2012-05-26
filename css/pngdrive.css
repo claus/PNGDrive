@@ -10,6 +10,9 @@ body {
     padding: 20px;
     text-align: center;
 }
+#decode-result {
+    display: none;
+}
 #file-error {
     display: none;
     border: 2px solid red;
