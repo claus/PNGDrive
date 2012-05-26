@@ -68,3 +68,11 @@ Working on it..
 Claus Wahlers (claus at madeinhaus dot com)
 
 http://madeinhaus.com/
+
+## Credits
+
+PNGDrive.js uses TextEncoder from the stringencoding project:
+
+http://code.google.com/p/stringencoding/
+
+Licensed under Apache License 2.0
