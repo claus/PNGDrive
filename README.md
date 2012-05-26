@@ -2,7 +2,17 @@
 
 Pack your files into a PNG.
 
-## Usage (encode)
+## Demo
+
+http://pngdrive.devinhaus.com/
+
+And here's Hamlet in a PNG:
+
+![PNGDrive source code in a PNG](https://github.com/MadeInHaus/PNGDrive/raw/master/pngdrive.png)
+
+## Usage
+
+Encode:
 
 	<div id="file-drop-area">Drop files here</div>
 
@@ -24,7 +34,7 @@ Pack your files into a PNG.
 		};
 	</script>
 
-## Usage (decode)
+Decode:
 
 	<img id="pngdrive-image" src="pngdrive.png">
 
@@ -48,10 +58,8 @@ Pack your files into a PNG.
 
 Working on it..
 
-## Demo
+## Who?
 
-http://pngdrive.devinhaus.com/
+Claus Wahlers (claus at madeinhaus dot com)
 
-And here's Hamlet in a PNG:
-
-![PNGDrive source code in a PNG](https://github.com/MadeInHaus/PNGDrive/raw/master/pngdrive.png)
+http://madeinhaus.com/
