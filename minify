@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# get yuicompressor.jar here:
+# http://yuilibrary.com/download/yuicompressor/
+
+# point the YUI env var to where you put yuicompressor.jar, e.g.:
+# export YUI=~/jars
+
+java -jar $YUI/yuicompressor.jar src/encoding.js > lib/pngdrive-min.js
+java -jar $YUI/yuicompressor.jar src/pngdrive.js >> lib/pngdrive-min.js
