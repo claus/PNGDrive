@@ -26,6 +26,8 @@ And here's Hamlet in a PNG:
 		document.getElementById("file-drop-area").addEventListener('drop', handleFileSelect, false);
 
 		function handleFileSelect(event) {
+			event.preventDefault();
+			event.stopPropagation();
 			var files = event.dataTransfer.files;
 			for (var i = 0, file; file = files[i]; i++) {
 				pngdrive.addFile(file);
@@ -46,7 +48,7 @@ And here's Hamlet in a PNG:
 		var pngdrive = new PNGDrive();
 		var pngdriveImage = document.getElementById("pngdrive-image");
 
-		pngdriveImage.addEventListener('click', handleImageClick, false);
+		pngdriveImage.addEventListener('click', handleImageClick);
 
 		function handleImageClick(event) {
 			pngdrive.decode(pngdriveImage);
