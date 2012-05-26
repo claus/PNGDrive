@@ -12,7 +12,12 @@ And here's Hamlet in a PNG:
 
 ## Usage
 
-Encode:
+### Preparation
+
+	<script src="encoding.js"></script>
+	<script src="pngdrive.js"></script>
+
+### Encode
 
 	<div id="file-drop-area">Drop files here</div>
 
@@ -34,7 +39,7 @@ Encode:
 		};
 	</script>
 
-Decode:
+### Decode
 
 	<img id="pngdrive-image" src="pngdrive.png">
 
