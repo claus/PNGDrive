@@ -71,7 +71,7 @@ http://madeinhaus.com/
 
 ## Credits
 
-PNGDrive.js uses TextEncoder from the stringencoding project:
+PNGDrive.js uses TextEncoder/TextDecoder from the stringencoding project:
 
 http://code.google.com/p/stringencoding/
 
