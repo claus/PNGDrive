@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>PNGDrive.js</title>
+	<style>
+		div, input { margin-bottom: 10px; }
+		textarea { width: 300px; height: 100px; }
+	</style>
+</head>
+<body>
+
+<form id="form">
+<textarea id="text">Elected change management rebased toward exclusive WCF. Selected distributed debugged near elected cloud. The evangelist debugged on established JSON. A SOLID debugged upon assorted distributed. Any source control time boxed instead of a stack overflow. A platform interpreted in front of designated platform. Designated iteration interpreted except selected TDD. Compiled aspect oriented programming compiled off exclusive stack trace. Exclusive XP synergised between compiled polymorphism. Selected SQL compiled by some integer. Verified DBA time boxed after the SOAP.</textarea><br>
+<input type="submit" value="add">
+</form>
+<div id="info"></div>
+<div id="result"></div>
+
+<script src="../lib/pngdrive-min.js"></script>
+
+<script>
+	var pngdrive = new PNGDrive();
+
+	var formEl = document.getElementById("form");
+	var textEl = document.getElementById("text");
+	var infoEl = document.getElementById("info");
+	var resultEl = document.getElementById("result");
+
+	formEl.addEventListener('submit', submitHandler);
+
+	function submitHandler(event) {
+		event.preventDefault();
+		pngdrive.addTextFile(textEl.value, "file" + pngdrive.getFileCount() + ".txt", "text/plain");
+		pngdrive.encode(function() {
+			var imgDataURL = this.getDataURL();
+			resultEl.innerHTML = '<img src="' + imgDataURL + '" />';
+			var numFiles = this.getFileCount();
+			var imgSize = this.getImgSize();
+			var uncompressedSize = this.getUncompressedSize();
+			var compressedSize = this.getCompressedSize();
+			infoEl.innerHTML = numFiles + ' Files<br>' + imgSize + 'x' + imgSize + 'px<br>Uncompressed: ' + uncompressedSize + '<br>Compressed: ' + compressedSize;
+		});
+	}
+
+</script>
+</body>
+</html>

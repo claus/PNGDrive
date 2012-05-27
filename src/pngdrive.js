@@ -14,8 +14,8 @@ window.PNGDrive.prototype = {
 		this.files.push({ name: file.name, type: file.type, fileRef: file });
 	},
 
-	addTextFile: function(content, name, type) {
-		this.files.push({ name: name, type: type, content: content });
+	addTextFile: function(text, name, type) {
+		this.files.push({ name: name, type: type, content: TextEncoder("utf-8").encode(text) });
 	},
 
 	removeAll: function() {
