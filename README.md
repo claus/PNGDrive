@@ -10,7 +10,7 @@ And here's Hamlet in a PNG:
 
 ![PNGDrive source code in a PNG](https://github.com/MadeInHaus/PNGDrive/raw/master/examples/images/hamlet.png)
 
-Hint: The favicon also looks sort of suspicious ;)
+Hint: The demo's favicon looks sort of suspicious, too ;)
 
 ## Usage
 
