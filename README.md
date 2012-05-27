@@ -8,7 +8,7 @@ http://pngdrive.devinhaus.com/
 
 And here's Hamlet in a PNG:
 
-![PNGDrive source code in a PNG](https://github.com/MadeInHaus/PNGDrive/raw/master/pngdrive.png)
+![PNGDrive source code in a PNG](https://github.com/MadeInHaus/PNGDrive/raw/master/examples/images/hamlet.png)
 
 ## Usage
 

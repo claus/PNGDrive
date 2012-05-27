@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>PNGDrive.js</title>
+	<style>
+		div, input { margin-bottom: 10px; }
+	</style>
+</head>
+<body>
+
+<input id="select" type="file" name="files[]" multiple />
+<div id="info"></div>
+<div id="result"></div>
+
+<script src="../lib/pngdrive-min.js"></script>
+
+<script>
+	var pngdrive = new PNGDrive();
+
+	var selectEl = document.getElementById("select");
+	var infoEl = document.getElementById("info");
+	var resultEl = document.getElementById("result");
+
+	selectEl.addEventListener('change', selectHandler, false);
+
+	function selectHandler(event) {
+		var fl = event.target.files;
+		for (var i = 0, f; f = fl[i]; i++) {
+			pngdrive.addFile(f);
+		}
+		pngdrive.encode(function() {
+			var imgDataURL = this.getDataURL();
+			resultEl.innerHTML = '<img src="' + imgDataURL + '" />';
+			var numFiles = this.getFileCount();
+			var imgSize = this.getImgSize();
+			var uncompressedSize = this.getUncompressedSize();
+			var compressedSize = this.getCompressedSize();
+			infoEl.innerHTML = numFiles + ' Files<br>' + imgSize + 'x' + imgSize + 'px<br>Uncompressed: ' + uncompressedSize + '<br>Compressed: ' + compressedSize;
+		});
+	}
+
+</script>
+</body>
+</html>

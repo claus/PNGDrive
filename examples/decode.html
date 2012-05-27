@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>PNGDrive.js</title>
+	<style>
+		div, input { margin-bottom: 10px; }
+	</style>
+</head>
+<body>
+
+Click an image below:<br>
+<img src="images/hamlet.png" />
+<img src="images/goethe.png" />
+<div id="info"></div>
+<div id="files"></div>
+<div id="content"></div>
+
+<script src="../lib/pngdrive-min.js"></script>
+
+<script>
+	var pngdrive = new PNGDrive();
+
+	var infoEl = document.getElementById("info");
+	var filesEl = document.getElementById("files");
+	var contentEl = document.getElementById("content");
+
+	var images = document.getElementsByTagName("img");
+	for(var i = 0; i < images.length; i++) {
+		images[i].addEventListener('click', clickHandler);
+	}
+
+	function clickHandler(event) {
+		event.preventDefault();
+		// Decode the target image
+		pngdrive.decode(event.target);
+		// Display some general info about the image
+		var imgSize = pngdrive.getImgSize();
+		var uncompressedSize = pngdrive.getUncompressedSize();
+		var compressedSize = pngdrive.getCompressedSize();
+		infoEl.innerHTML = event.target.src + '<br>' + imgSize + 'x' + imgSize + 'px<br>Uncompressed: ' + uncompressedSize + '<br>Compressed: ' + compressedSize;
+		// Display info about the files contained in the image
+		var numFiles = pngdrive.getFileCount();
+		var files = "Contains " + numFiles + ' files:<br>';
+		for(var i= 0; i < numFiles; i++) {
+			var file = pngdrive.getFileAt(i);
+			if(file.type.split("/")[0] == 'text') {
+				files += '<a data-index="' + i + '" href="#">' + file.name + '</a>';
+			} else {
+				files += file.name;
+			}
+			files += ' (' + file.type + ', ' + file.content.byteLength + ' bytes)<br>'
+		}
+		filesEl.innerHTML = files;
+		var fileAnchors = document.getElementsByTagName("a");
+		for(var i = 0; i < fileAnchors.length; i++) {
+			fileAnchors[i].addEventListener('click', fileAnchorClickHandler);
+		}
+	}
+
+	function fileAnchorClickHandler(event) {
+		event.preventDefault();
+		var file = pngdrive.getFileAt(event.target.dataset["index"]);
+		if(file.type.split("/")[0] == 'text') {
+			contentEl.innerHTML = '<pre>' + TextDecoder('utf-8'). decode(file.content) + '</pre>';
+		}
+	}
+
+</script>
+</body>
+</html>

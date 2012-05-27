@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>PNGDrive.js</title>
+	<style>
+		div { margin-bottom: 10px; }
+		#drop { padding: 20px; border: 2px dashed #888; color: #888; }
+	</style>
+</head>
+<body>
+
+<div id="drop">Drop files here</div>
+<div id="info"></div>
+<div id="result"></div>
+
+<script src="../lib/pngdrive-min.js"></script>
+
+<script>
+	var pngdrive = new PNGDrive();
+
+	var dropEl = document.getElementById("drop");
+	var infoEl = document.getElementById("info");
+	var resultEl = document.getElementById("result");
+
+	dropEl.addEventListener('drop', dropHandler, false);
+
+	function dropHandler(event) {
+		event.preventDefault();
+		event.stopPropagation();
+		var files = event.dataTransfer.files;
+		for (var i = 0, file; file = files[i]; i++) {
+			pngdrive.addFile(file);
+		}
+		pngdrive.encode(function() {
+			var imgDataURL = this.getDataURL();
+			resultEl.innerHTML = '<img src="' + imgDataURL + '" />';
+			var numFiles = this.getFileCount();
+			var imgSize = this.getImgSize();
+			var uncompressedSize = this.getUncompressedSize();
+			var compressedSize = this.getCompressedSize();
+			infoEl.innerHTML = numFiles + ' Files<br>' + imgSize + 'x' + imgSize + 'px<br>Uncompressed: ' + uncompressedSize + '<br>Compressed: ' + compressedSize;
+		});
+	}
+
+</script>
+</body>
+</html>
