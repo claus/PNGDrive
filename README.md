@@ -10,7 +10,7 @@ And here's Hamlet in a PNG:
 
 ![PNGDrive source code in a PNG](https://github.com/MadeInHaus/PNGDrive/raw/master/examples/images/hamlet.png)
 
-Hint: The demo's favicon looks sort of suspicious, too ;)
+And the demo's favicon looks sort of suspicious, too..
 
 ## Usage
 
@@ -65,6 +65,37 @@ Hint: The demo's favicon looks sort of suspicious, too ;)
 ## API
 
 Working on it..
+
+## How?
+
+PNGDrive.js stores data in the first three bytes (RGB) of a 32bit pixel value.
+The forth byte (alpha value) is always set to 0xFF (255). It can't be used for data storage
+due to limitations in the Canvas API. See the following note from the
+[WhatWG Canvas API](http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-getimagedata)
+for an explanation:
+
+> Due to the lossy nature of converting to and from
+> premultiplied alpha color values, pixels that have just been set using putImageData()
+> might be returned to an equivalent getImageData() as different values.
+
+### File Format
+
+	Bytes 0..1           INTRO (Intro marker, 0xDADA)
+	Bytes 2              VERSION_HI (File format version info, major)
+	Bytes 3              VERSION_LO (File format version info, minor)
+	Bytes 4..7           DIRLEN (Length of DIR in bytes, 32 bits, little endian)
+	Bytes 8..8+DIRLEN-1  DIR (Directory in JSON format)
+    Bytes 8+DIRLEN..     PAYLOAD
+
+Example DIR structure:
+
+	{
+		files: [
+			{ "name": "text.txt", "size": 12345, "type": "text/plain" },
+			{ "name": "image.jpg", "size": 23456, "type": "image/jpeg" },
+			{ "name": "binary.bin", "size": 34567 }
+		]
+	}
 
 ## Who?
 
