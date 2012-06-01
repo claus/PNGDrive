@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>PNGDrive Steganography Demo</title>
+	<meta property="og:title" content="PNGDrive Steganography Demo"/>
+	<meta property="og:description" content="PNGDrive.js is a JavaScript library to pack multiple files into a PNG."/>
+	<meta property="og:type" content="movie"/>
+	<meta property="og:url" content="http://pngdrive.devinhaus.com/examples/decode_new.html"/>
+	<meta property="og:image" content="http://pngdrive.devinhaus.com/examples/images/commodore.png"/>
+	<meta property="fb:admins" content="700876948"/>
+	<style>
+		body { font-family: Helvetica, Arial, sans-serif; }
+		div, input { margin: 10px 0; }
+		p { color: red; }
+		.name { font-weight: bold; }
+	</style>
+</head>
+<body>
+
+<h1><a href="https://github.com/MadeInHaus/PNGDrive">PNGDrive</a> Steganography Demo</h1>
+<p>Click an image below to reveal its contents</p>
+<div>
+	<img src="images/commodore_2bit.png" data-bits="2" />
+	<img src="images/commodore_4bit.png" data-bits="4" />
+	<img src="images/commodore_6bit.png" data-bits="6" />
+	<img src="images/commodore_8bit.png" data-bits="8" />
+</div>
+<div id="info"></div>
+<div id="files"></div>
+<div id="content"></div>
+
+<script src="../lib/pngdrive-min.js"></script>
+
+<script>
+	var pngdrive = new PNGDrive();
+
+	var infoEl = document.getElementById("info");
+	var filesEl = document.getElementById("files");
+	var contentEl = document.getElementById("content");
+
+	var images = document.getElementsByTagName("img");
+	for(var i = 0; i < images.length; i++) {
+		images[i].addEventListener('click', clickHandler);
+	}
+
+	function clickHandler(event) {
+		event.preventDefault();
+		// Decode the target image
+		var bitsPerColorComponent = parseInt(event.target.dataset["bits"] || "8");
+		pngdrive.decode(event.target, bitsPerColorComponent);
+		// Display some general info about the image
+		infoEl.innerHTML = event.target.src + '<br>Data Bits per Color Component: ' + bitsPerColorComponent + "<br>";
+		// Display info about the files contained in the image
+		var numFiles = pngdrive.getFileCount();
+		var files = "Contains " + numFiles + ' files:<br>';
+		for(var i= 0; i < numFiles; i++) {
+			var file = pngdrive.getFileAt(i);
+			files += '- <a class="name" data-index="' + i + '" href="#">' + file.name + '</a>';
+			files += ' (' + file.type + ', ' + file.content.byteLength + ' bytes)<br>'
+		}
+		filesEl.innerHTML = files;
+		var fileAnchors = document.getElementsByTagName("a");
+		for(var i = 0; i < fileAnchors.length; i++) {
+			fileAnchors[i].addEventListener('click', fileAnchorClickHandler);
+		}
+		contentEl.innerHTML = "";
+	}
+
+	function fileAnchorClickHandler(event) {
+		event.preventDefault();
+		var file = pngdrive.getFileAt(event.target.dataset["index"]);
+		if(file.type.split("/")[0] == 'text') {
+			contentEl.innerHTML = '<pre>' + TextDecoder('utf-8').decode(file.content) + '</pre>';
+		} else {
+			var d = "<pre>" + file.name + "\n";
+			var a = "";
+			var j = 0;
+			for(var i = 0; i < file.content.byteLength; i++) {
+				d += toHex(file.content[i]) + " ";
+				a += (file.content[i] >= 32 && file.content[i] < 127) ? "&#" + file.content[i] : ".";
+				if(++j == 16) {
+					d += " " + a + "\n";
+					a = "";
+					j = 0;
+				}
+			}
+			d += "</pre>";
+			contentEl.innerHTML = d;
+		}
+	}
+
+	function toHex(value) {
+		return ((value < 16) ? "0" : "") + value.toString(16);
+	}
+
+</script>
+<script>
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-3655801-5']);
+	_gaq.push(['_trackPageview']);
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+</script>
+</body>
+</html>

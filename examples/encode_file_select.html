@@ -30,13 +30,11 @@
 			pngdrive.addFile(f);
 		}
 		pngdrive.encode(function() {
-			var imgDataURL = this.getDataURL();
+			var img = this.createImage();
+			var imgDataURL = img.toDataURL();
 			resultEl.innerHTML = '<img src="' + imgDataURL + '" />';
 			var numFiles = this.getFileCount();
-			var imgSize = this.getImgSize();
-			var uncompressedSize = this.getUncompressedSize();
-			var compressedSize = this.getCompressedSize();
-			infoEl.innerHTML = numFiles + ' Files<br>' + imgSize + 'x' + imgSize + 'px<br>Uncompressed: ' + uncompressedSize + '<br>Compressed: ' + compressedSize;
+			infoEl.innerHTML = 'Encoded ' + numFiles + ' Files';
 		});
 	}
 

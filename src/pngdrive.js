@@ -18,6 +18,10 @@ window.PNGDrive.prototype = {
 		this.files.push({ name: name, type: type, content: TextEncoder("utf-8").encode(text) });
 	},
 
+	addBinaryFile: function(uint8Array, name, type) {
+		this.files.push({ name: name, type: type, content: uint8Array });
+	},
+
 	removeAll: function() {
 		this.files = [];
 	},
@@ -54,99 +58,44 @@ window.PNGDrive.prototype = {
 		return null;
 	},
 
-	decode: function(image) {
+	decode: function(image, bitsPerColorComponent) {
+		if (typeof bitsPerColorComponent == "undefined") { bitsPerColorComponent = 8; }
 		var canvas = document.createElement('canvas');
+		var ctx = canvas.getContext('2d');
 		canvas.width = image.width;
 		canvas.height = image.height;
-		var ctx = canvas.getContext('2d');
 		ctx.drawImage(image, 0, 0);
 		var img = ctx.getImageData(0, 0, image.width, image.height);
 		var imgData = img.data;
-		var length = imgData.length; i = 0, j = 0;
-		this.raw = new Uint8Array(image.width * image.height * 3);
-		while(i < length) {
-			if(i % 4 != 3) {
-				this.raw[j++] = imgData[i];
+		var length = imgData.length;
+		var buf = this.raw = new Uint8Array(image.width * image.height * 3);
+		var i = 0;
+		if(bitsPerColorComponent == 8) {
+			var j = 0;
+			while(i < length) {
+				if(imgData[i + 3] == 0xff) {
+					buf[j++] = imgData[i++];
+					buf[j++] = imgData[i++];
+					buf[j++] = imgData[i++];
+					i++;
+				} else {
+					i += 4;
+				}
 			}
-			i++;
-		}
-		this.deserialize();
-	},
-
-	encode: function(callback) {
-		var that = this;
-		var numFilesToLoad = 0;
-		var fileCount = this.files.length;
-		this._dataURL = null;
-		this._canvasElement = null;
-		for(var i = 0; i < fileCount; i++) {
-			var file = this.files[i];
-			if(file.fileRef) {
-				numFilesToLoad++;
-				var reader = new FileReader();
-				reader.onload = (function(f) {
-					return function(event) {
-						f.content = new Uint8Array(event.target.result);
-						delete f.fileRef;
-						if(--numFilesToLoad == 0 && i == fileCount) {
-							numFilesToLoad = -1;
-							that.serialize();
-							if(callback) {
-								callback.call(that);
-							}
-						}
-					};
-				})(file);
-				reader.readAsArrayBuffer(file.fileRef);
+		} else {
+			var bitStream = new PNGDriveBitStream(buf);
+			while(i < length) {
+				if(imgData[i + 3] == 0xff) {
+					bitStream.writeBits(bitsPerColorComponent, imgData[i++]);
+					bitStream.writeBits(bitsPerColorComponent, imgData[i++]);
+					bitStream.writeBits(bitsPerColorComponent, imgData[i++]);
+					i++;
+				} else {
+					i += 4;
+				}
 			}
 		}
-		if(numFilesToLoad == 0) {
-			this.serialize();
-			if(callback) {
-				callback.call(this);
-			}
-		}
-	},
-
-	serialize: function() {
-		var j, pos, file;
-		var dir = { files: [] };
-		var payLoadSize = 0;
-		var fileCount = this.files.length;
-		for(j = 0; j < fileCount; j++) {
-			file = this.files[j];
-			payLoadSize += file.content.byteLength;
-			dir.files.push({ name: file.name, size: file.content.byteLength, type: file.type });
-		}
-		var dirBuf = TextEncoder("utf-8").encode(JSON.stringify(dir));
-		var dirSize = dirBuf.byteLength;
-		var totalSize = 8 + dirSize + payLoadSize;
-		var buf = this.raw = new Uint8Array(new ArrayBuffer(totalSize));
-		// intro, 0xDADA
-		buf[0] = buf[1] = 0xda;
-		// version, major/minor
-		buf[2] = this.VERSION_MAJOR;
-		buf[3] = this.VERSION_MINOR;
-		// directory size, 32 bit little endian
-		buf[4] = dirSize & 0xff;
-		buf[5] = (dirSize >> 8) & 0xff;
-		buf[6] = (dirSize >> 16) & 0xff;
-		buf[7] = (dirSize >> 24) & 0xff;
-		// write directory
-		buf.set(dirBuf, 8);
-		// write files
-		for(j = 0, pos = 8 + dirBuf.byteLength; j < fileCount; j++) {
-			file = this.files[j];
-			buf.set(file.content, pos);
-			pos += file.content.byteLength;
-		}
-	},
-
-	deserialize: function() {
-		var buf = this.raw;
 		if(buf[0] == 0xda && buf[1] == 0xda) {
-			var versionHi = buf[2];
-			var versionLo = buf[3];
 			var dirSize = buf[4] | buf[5] << 8 | buf[6] << 16 | buf[7] << 24;
 			var dirBuf = buf.subarray(8, 8 + dirSize);
 			var dir = JSON.parse(TextDecoder("utf-8").decode(dirBuf));
@@ -162,58 +111,192 @@ window.PNGDrive.prototype = {
 		}
 	},
 
-	getCanvasElement: function() {
-		if(!this._canvasElement) {
-			var px = this.getImgSize();
-			if(px > 0) {
-				this._canvasElement = document.createElement('canvas');
-				this._canvasElement.height = px;
-				this._canvasElement.width = px;
-				var ctx = this._canvasElement.getContext('2d');
-				var img = ctx.getImageData(0, 0, px, px);
-				var imgData = img.data;
-				var length = this.raw.byteLength;
-				var i = 0, j = 0;
-				while(i < length) {
-					imgData[j] = (j++ % 4 == 3) ? 255 : this.raw[i++];
+	encode: function(callback) {
+		var that = this;
+		(function(serialize) {
+			var numFilesToLoad = 0;
+			var fileCount = that.getFileCount();
+			for(var i = 0; i < fileCount; i++) {
+				var file = that.files[i];
+				if(file.fileRef) {
+					numFilesToLoad++;
+					var reader = new FileReader();
+					reader.onload = (function(f) {
+						return function(event) {
+							f.content = new Uint8Array(event.target.result);
+							delete f.fileRef;
+							if(--numFilesToLoad == 0 && i == fileCount) {
+								numFilesToLoad = -1;
+								serialize.call(that);;
+							}
+						};
+					})(file);
+					reader.readAsArrayBuffer(file.fileRef);
 				}
-				ctx.putImageData(img, 0, 0);
+			}
+			if(numFilesToLoad == 0) {
+				serialize.call(that);;
+			}
+		})(function() {
+			var fileCount = this.getFileCount();
+			if(fileCount > 0) {
+				var j, pos, file;
+				var dir = { files: [] };
+				var payLoadSize = 0;
+				for(j = 0; j < fileCount; j++) {
+					file = this.files[j];
+					payLoadSize += file.content.byteLength;
+					dir.files.push({ name: file.name, size: file.content.byteLength, type: file.type });
+				}
+				var dirBuf = TextEncoder("utf-8").encode(JSON.stringify(dir));
+				var dirSize = dirBuf.byteLength;
+				var totalSize = 8 + dirSize + payLoadSize;
+				var buf = this.raw = new Uint8Array(new ArrayBuffer(totalSize));
+				// intro, 0xDADA
+				buf[0] = buf[1] = 0xda;
+				// version, major/minor
+				buf[2] = this.VERSION_MAJOR;
+				buf[3] = this.VERSION_MINOR;
+				// directory size, 32 bit little endian
+				buf[4] = dirSize & 0xff;
+				buf[5] = (dirSize >> 8) & 0xff;
+				buf[6] = (dirSize >> 16) & 0xff;
+				buf[7] = (dirSize >> 24) & 0xff;
+				// write directory
+				buf.set(dirBuf, 8);
+				// write files
+				for(j = 0, pos = 8 + dirBuf.byteLength; j < fileCount; j++) {
+					file = this.files[j];
+					buf.set(file.content, pos);
+					pos += file.content.byteLength;
+				}
+			} else {
+				this.raw = new Uint8Array(0);
+			}
+			if(callback) {
+				callback.call(this);
+			}
+		});
+	},
+
+	createImage: function(targetImage, bitsPerColorComponent) {
+		var canvas = document.createElement('canvas');
+		var ctx = canvas.getContext('2d');
+		if(typeof targetImage == "undefined") {
+			bitsPerColorComponent = 8;
+			var px = Math.ceil(Math.sqrt(this.raw.byteLength / 3));
+			canvas.width = px;
+			canvas.height = px;
+			ctx.fillRect(0, 0, px, px);
+		} else {
+			if(typeof bitsPerColorComponent == "undefined") { bitsPerColorComponent = 8; }
+			canvas.width = targetImage.width;
+			canvas.height = targetImage.height;
+			ctx.drawImage(targetImage, 0, 0);
+		}
+		var img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+		var imgData = img.data;
+		var imgLength = imgData.length;
+		var i = 0;
+		if(bitsPerColorComponent == 8) {
+			var j = 0;
+			while(i < imgLength) {
+				if(imgData[i + 3] == 0xff) {
+					imgData[i++] = this.raw[j++];
+					imgData[i++] = this.raw[j++];
+					imgData[i++] = this.raw[j++];
+					i++;
+				} else {
+					i += 4;
+				}
+			}
+		} else {
+			var bitStream = new PNGDriveBitStream(this.raw);
+			var bitMask = 0xff ^ (0xff >>> (8 - bitsPerColorComponent));
+			while(i < imgLength) {
+				if(imgData[i + 3] == 0xff) {
+					imgData[i] = (imgData[i++] & bitMask) | bitStream.readBits(bitsPerColorComponent);
+					imgData[i] = (imgData[i++] & bitMask) | bitStream.readBits(bitsPerColorComponent);
+					imgData[i] = (imgData[i++] & bitMask) | bitStream.readBits(bitsPerColorComponent);
+					i++;
+				} else {
+					i += 4;
+				}
 			}
 		}
-		return this._canvasElement;
-	},
-
-	getDataURL: function() {
-		if(!this._dataURL) {
-			var canvas = this.getCanvasElement();
-			this._dataURL = canvas ? canvas.toDataURL() : "";
-		}
-		return this._dataURL;
-	},
-
-	getImgElement: function() {
-		var px = this.getImgSize();
-		if(px > 0) {
-			var img = document.createElement('img');
-			img.height = px;
-			img.width = px;
-			img.src = this.getDataURL();
-			return img;
-		} else {
-			return null;
-		}
-	},
-
-	getImgSize: function() {
-		return Math.ceil(Math.sqrt(this.getUncompressedSize() / 3));
-	},
-
-	getCompressedSize: function() {
-		var dataURL = this.getDataURL();
-		return (dataURL && dataURL.length > 0) ? atob(dataURL.split(",")[1]).length : 0;
-	},
-
-	getUncompressedSize: function() {
-		return this.raw.byteLength;
+		ctx.putImageData(img, 0, 0);
+		return canvas;
 	}
+
+};
+
+
+window.PNGDriveBitStream = function(uint8Array) {
+
+	this.a = uint8Array;
+	this.position = 0;
+	this.bitsPending = 0;
+
+};
+
+window.PNGDriveBitStream.prototype = {
+
+	writeBits: function(bits, value) {
+		if (bits == 0) { return; }
+		value &= (0xffffffff >>> (32 - bits));
+		var bitsConsumed;
+		if (this.bitsPending > 0) {
+			if (this.bitsPending > bits) {
+				this.a[this.position - 1] |= value << (this.bitsPending - bits);
+				bitsConsumed = bits;
+				this.bitsPending -= bits;
+			} else if (this.bitsPending == bits) {
+				this.a[this.position - 1] |= value;
+				bitsConsumed = bits;
+				this.bitsPending = 0;
+			} else {
+				this.a[this.position - 1] |= value >> (bits - this.bitsPending);
+				bitsConsumed = this.bitsPending;
+				this.bitsPending = 0;
+			}
+		} else {
+			bitsConsumed = Math.min(8, bits);
+			this.bitsPending = 8 - bitsConsumed;
+			this.a[this.position++] = (value >> (bits - bitsConsumed)) << this.bitsPending;
+		}
+		bits -= bitsConsumed;
+		if (bits > 0) {
+			this.writeBits(bits, value);
+		}
+	},
+
+	readBits: function(bits, bitBuffer) {
+		if (typeof bitBuffer == "undefined") { bitBuffer = 0; }
+		if (bits == 0) { return bitBuffer; }
+		var partial;
+		var bitsConsumed;
+		if (this.bitsPending > 0) {
+			var b = this.a[this.position - 1] & (0xff >> (8 - this.bitsPending));
+			bitsConsumed = Math.min(this.bitsPending, bits);
+			this.bitsPending -= bitsConsumed;
+			partial = b >> this.bitsPending;
+		} else {
+			bitsConsumed = Math.min(8, bits);
+			this.bitsPending = 8 - bitsConsumed;
+			partial = this.a[this.position++] >> this.bitsPending;
+		}
+		bits -= bitsConsumed;
+		bitBuffer = (bitBuffer << bitsConsumed) | partial;
+		return (bits > 0) ? this.readBits(bits, bitBuffer) : bitBuffer;
+	},
+
+	seekTo: function(bitPos) {
+		this.position = (bitPos / 8) | 0;
+		this.bitsPending = bitPos % 8;
+		if(this.bitsPending > 0) {
+			this.bitsPending = 8 - this.bitsPending;
+			this.position++;
+		}
+	}
+
 };

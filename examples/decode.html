@@ -35,10 +35,8 @@ Click an image below:<br>
 		// Decode the target image
 		pngdrive.decode(event.target);
 		// Display some general info about the image
-		var imgSize = pngdrive.getImgSize();
-		var uncompressedSize = pngdrive.getUncompressedSize();
-		var compressedSize = pngdrive.getCompressedSize();
-		infoEl.innerHTML = event.target.src + '<br>' + imgSize + 'x' + imgSize + 'px<br>Uncompressed: ' + uncompressedSize + '<br>Compressed: ' + compressedSize;
+		var imgSize = event.target.width;
+		infoEl.innerHTML = event.target.src + '<br>' + imgSize + 'x' + imgSize + 'px<br>';
 		// Display info about the files contained in the image
 		var numFiles = pngdrive.getFileCount();
 		var files = "Contains " + numFiles + ' files:<br>';

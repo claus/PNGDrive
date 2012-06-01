@@ -6,17 +6,16 @@ Pack your files into a PNG.
 
 http://pngdrive.devinhaus.com/
 
-And here's Hamlet in a PNG:
-
-![PNGDrive source code in a PNG](https://github.com/MadeInHaus/PNGDrive/raw/master/examples/images/hamlet.png)
-
-And the demo's favicon looks sort of suspicious, too..
+![](https://github.com/MadeInHaus/PNGDrive/raw/master/examples/images/commodore_2bit.png)
+![](https://github.com/MadeInHaus/PNGDrive/raw/master/examples/images/commodore_4bit.png)
+![](https://github.com/MadeInHaus/PNGDrive/raw/master/examples/images/commodore_6bit.png)
+![](https://github.com/MadeInHaus/PNGDrive/raw/master/examples/images/commodore_8bit.png)
 
 ## Usage
 
 ### Preparation
 
-	<script src="lib/pngdrive-min.js"></script>
+	<script src="pngdrive-min.js"></script>
 
 ### Encode
 
@@ -35,8 +34,7 @@ And the demo's favicon looks sort of suspicious, too..
 				pngdrive.addFile(file);
 			}
 			pngdrive.encode(function() {
-				var imgEl = this.getImgElement();
-				var imgSize = this.getImgSize();
+				var canvas = this.createImage();
 				// etc..
 			});
 		};
@@ -62,6 +60,18 @@ And the demo's favicon looks sort of suspicious, too..
 		}
 	</script>
 
+### More examples
+
+http://pngdrive.devinhaus.com/examples/decode.html
+
+http://pngdrive.devinhaus.com/examples/decode_steganography.html
+
+http://pngdrive.devinhaus.com/examples/encode_file_drag_drop.html
+
+http://pngdrive.devinhaus.com/examples/encode_file_select.html
+
+http://pngdrive.devinhaus.com/examples/encode_text.html
+
 ## API
 
 Working on it..
@@ -71,7 +81,7 @@ Working on it..
 PNGDrive.js stores data in the first three bytes (RGB) of a 32bit pixel value.
 The forth byte (alpha value) is always set to 0xFF (255). It can't be used for data storage
 due to limitations in the Canvas API. See the following note from the
-[WhatWG Canvas API](http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-getimagedata)
+[WhatWG Canvas Spec](http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-getimagedata)
 for an explanation:
 
 > Due to the lossy nature of converting to and from
