@@ -10,14 +10,12 @@ http://pngdrive.devinhaus.com/
 
 PNGDrive now supports Steganography: Files can be injected into a target bitmap.
 
-Here is an example of PNGDrive Steganography in action, showing the Commodore 64 operating system ROMs injected into a Commodore logo with different numbers of bits per color component (2, 4, 6 and 8):
+[Here is an example of PNGDrive Steganography in action](http://pngdrive.devinhaus.com/examples/decode_steganography.html), showing the Commodore 64 operating system ROMs injected into a Commodore logo with different numbers of bits per color component (2, 4, 6 and 8):
 
 ![](https://github.com/MadeInHaus/PNGDrive/raw/master/examples/images/commodore_2bit.png)
 ![](https://github.com/MadeInHaus/PNGDrive/raw/master/examples/images/commodore_4bit.png)
 ![](https://github.com/MadeInHaus/PNGDrive/raw/master/examples/images/commodore_6bit.png)
 ![](https://github.com/MadeInHaus/PNGDrive/raw/master/examples/images/commodore_8bit.png)
-
-[Steganography Demo](http://pngdrive.devinhaus.com/examples/decode_steganography.html)
 
 ## Usage
 
@@ -70,15 +68,11 @@ Here is an example of PNGDrive Steganography in action, showing the Commodore 64
 
 ### More examples
 
-http://pngdrive.devinhaus.com/examples/decode.html
-
-http://pngdrive.devinhaus.com/examples/decode_steganography.html
-
-http://pngdrive.devinhaus.com/examples/encode_file_drag_drop.html
-
-http://pngdrive.devinhaus.com/examples/encode_file_select.html
-
-http://pngdrive.devinhaus.com/examples/encode_text.html
+http://pngdrive.devinhaus.com/examples/decode.html  
+http://pngdrive.devinhaus.com/examples/decode_steganography.html  
+http://pngdrive.devinhaus.com/examples/encode_file_drag_drop.html  
+http://pngdrive.devinhaus.com/examples/encode_file_select.html  
+http://pngdrive.devinhaus.com/examples/encode_text.html  
 
 ## API
 
@@ -86,9 +80,11 @@ Working on it..
 
 ## How?
 
-PNGDrive.js stores data in the first three bytes (RGB) of a 32bit pixel value.
-The forth byte (alpha value) is always set to 0xFF (255). It can't be used for data storage
-due to limitations in the Canvas API. See the following note from the
+PNGDrive stores data in the first three bytes (RGB) of a 32bit pixel value.
+The forth byte (alpha value) is always set to 0xFF (255). If data is injected into a
+target image (Steganography), pixels with alpha transparency are ignored.
+Only fully opaque pixels can be used for data storage due to limitations
+in the Canvas API. See the following note from the
 [WhatWG Canvas Spec](http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-getimagedata)
 for an explanation:
 
