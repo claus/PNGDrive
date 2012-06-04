@@ -1,4 +1,4 @@
-window.PNGDrive = function() {
+window.PNGDrive = function(image, bitsPerColorComponent) {
 
 	this.VERSION_MAJOR = 1;
 	this.VERSION_MINOR = 0;
@@ -6,6 +6,9 @@ window.PNGDrive = function() {
 	this.files = [];
 	this.raw = new Uint8Array(0);
 
+	if(typeof image !== "undefined") {
+		this.decode(image, bitsPerColorComponent);
+	}
 };
 
 window.PNGDrive.prototype = {
@@ -109,6 +112,7 @@ window.PNGDrive.prototype = {
 				this.files.push({ name: file.name, type: file.type, content: fileBuf });
 			}
 		}
+		return this;
 	},
 
 	encode: function(callback) {
@@ -151,7 +155,7 @@ window.PNGDrive.prototype = {
 				var dirBuf = TextEncoder("utf-8").encode(JSON.stringify(dir));
 				var dirSize = dirBuf.byteLength;
 				var totalSize = 8 + dirSize + payLoadSize;
-				var buf = this.raw = new Uint8Array(new ArrayBuffer(totalSize));
+				var buf = this.raw = new Uint8Array(totalSize);
 				// intro, 0xDADA
 				buf[0] = buf[1] = 0xda;
 				// version, major/minor
@@ -226,6 +230,28 @@ window.PNGDrive.prototype = {
 		}
 		ctx.putImageData(img, 0, 0);
 		return canvas;
+	},
+
+	computeImageCapacity: function(targetImage, bitsPerColorComponent) {
+		if(typeof bitsPerColorComponent == "undefined") { bitsPerColorComponent = 8; }
+		var canvas = document.createElement('canvas');
+		var ctx = canvas.getContext('2d');
+		canvas.width = targetImage.width;
+		canvas.height = targetImage.height;
+		ctx.drawImage(targetImage, 0, 0);
+		var img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+		var imgData = img.data;
+		var imgLength = imgData.length;
+		var i = 0;
+		var numBits = 0;
+		var numBitsPerPixel = bitsPerColorComponent * 3;
+		while(i < imgLength) {
+			if(imgData[i + 3] == 0xff) {
+				numBits += numBitsPerPixel;
+			}
+			i += 4;
+		}
+		return numBits;
 	}
 
 };
