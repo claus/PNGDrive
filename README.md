@@ -23,6 +23,21 @@ PNGDrive now supports Steganography: Files can be injected into a target bitmap.
 
 	<script src="pngdrive-min.js"></script>
 
+### Decode
+
+	<script>
+		var img = new Image();
+		img.src = "image.png";
+		img.onload = function() {
+			var pngdrive = new PNGDrive(img);
+			var numFiles = pngdrive.getFileCount();
+			for (var i = 0; i < numFiles; i++) {
+				var file = pngdrive.getFileAt(i);
+				console.log(file.name, file.type, file.content);
+			}
+		}
+	</script>
+
 ### Encode
 
 	<div id="file-drop-area">Drop files here</div>
@@ -44,25 +59,6 @@ PNGDrive now supports Steganography: Files can be injected into a target bitmap.
 				// etc..
 			});
 		};
-	</script>
-
-### Decode
-
-	<img id="pngdrive-image" src="pngdrive.png">
-
-	<script>
-		var pngdrive = new PNGDrive();
-
-		document.getElementById("pngdrive-image").addEventListener('click', handleImageClick);
-
-		function handleImageClick(event) {
-			pngdrive.decode(event.target);
-			var numFiles = pngdrive.getFileCount();
-			for (var i = 0; i < numFiles; i++) {
-				var file = pngdrive.getFileAt(i);
-				console.log(file.name, file.type, file.content);
-			}
-		}
 	</script>
 
 ### More examples
