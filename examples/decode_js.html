@@ -6,21 +6,20 @@
 </head>
 <body>
 
+<p><a href="https://github.com/MadeInHaus/PNGDrive">PNGDrive on GitHub</a></p>
+
 <script src="../lib/pngdrive-min.js"></script>
 <script>
 
 	function doStuff() {
-		$("body")
-			.append("<div>Hello World from jQuery!</div>")
-			.css("margin-left", 300)
-			.animate({"margin-left": 10}, 3000);
+		var div = $("<div>Hello World from jQuery!</div>").css("margin-left", 300).animate({"margin-left": 0}, 3000);
+		$("body").append(div);
 	}
 
 	var image = new Image();
 	image.src = "images/jquery-1.7.2.min.png";
 	image.onload = function(e) {
-		var pngdrive = new PNGDrive();
-		pngdrive.decode(e.target);
+		var pngdrive = new PNGDrive(e.target);
 		eval(TextDecoder('utf-8').decode(pngdrive.getFileByName("jquery-1.7.2.min.js").content));
 		doStuff();
 	}
