@@ -51,12 +51,10 @@ PNGDrive now supports Steganography: Files can be injected into a target bitmap.
 	<img id="pngdrive-image" src="pngdrive.png">
 
 	<script>
-		var pngdrive = new PNGDrive();
-
 		document.getElementById("pngdrive-image").addEventListener('click', handleImageClick);
 
 		function handleImageClick(event) {
-			pngdrive.decode(event.target);
+			var pngdrive = new PNGDrive(event.target);
 			var numFiles = pngdrive.getFileCount();
 			for (var i = 0; i < numFiles; i++) {
 				var file = pngdrive.getFileAt(i);
