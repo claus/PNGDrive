@@ -18,7 +18,7 @@ window.PNGDrive.prototype = {
 	},
 
 	addTextFile: function(text, name, type) {
-		this.files.push({ name: name, type: type, content: TextEncoder("utf-8").encode(text) });
+		this.files.push({ name: name, type: type, content: this.utf8Encode(text) });
 	},
 
 	addBinaryFile: function(uint8Array, name, type) {
@@ -101,7 +101,7 @@ window.PNGDrive.prototype = {
 		if(buf[0] == 0xda && buf[1] == 0xda) {
 			var dirSize = buf[4] | buf[5] << 8 | buf[6] << 16 | buf[7] << 24;
 			var dirBuf = buf.subarray(8, 8 + dirSize);
-			var dir = JSON.parse(TextDecoder("utf-8").decode(dirBuf));
+			var dir = JSON.parse(this.utf8Decode(dirBuf));
 			var pos = 8 + dirSize;
 			this.files = [];
 			for(i = 0; i < dir.files.length; i++) {
@@ -152,7 +152,7 @@ window.PNGDrive.prototype = {
 					payLoadSize += file.content.byteLength;
 					dir.files.push({ name: file.name, size: file.content.byteLength, type: file.type });
 				}
-				var dirBuf = TextEncoder("utf-8").encode(JSON.stringify(dir));
+				var dirBuf = this.utf8Encode(JSON.stringify(dir));
 				var dirSize = dirBuf.byteLength;
 				var totalSize = 8 + dirSize + payLoadSize;
 				var buf = this.raw = new Uint8Array(totalSize);
@@ -252,14 +252,53 @@ window.PNGDrive.prototype = {
 			i += 4;
 		}
 		return numBits;
+	},
+
+	utf8Encode: function(string) {
+		var tmparr = [];
+		var len = string.length;
+		for (var n = 0; n < len; n++) {
+			var c = string.charCodeAt(n);
+			if (c < 128) {
+				tmparr.push(c);
+			} else if((c > 127) && (c < 2048)) {
+				tmparr.push((c >> 6) | 192);
+				tmparr.push((c & 63) | 128);
+			} else {
+				tmparr.push((c >> 12) | 224);
+				tmparr.push(((c >> 6) & 63) | 128);
+				tmparr.push((c & 63) | 128);
+			}
+		}
+		return new Uint8Array(tmparr);
+	},
+
+	utf8Decode: function(uint8array) {
+		var len = uint8array.byteLength;
+		var string = "";
+		var i = 0;
+		while (i < len) {
+			var c = uint8array[i];
+			if (c < 128) {
+				string += String.fromCharCode(c);
+				i++;
+			} else if((c > 191) && (c < 224) && (i + 1 < len)) {
+				string += String.fromCharCode(((c & 31) << 6) | (uint8array[i + 1] & 63));
+				i += 2;
+			} else if(i + 2 < len) {
+				string += String.fromCharCode(((c & 15) << 12) | ((uint8array[i + 1] & 63) << 6) | (uint8array[i + 2] & 63));
+				i += 3;
+			}
+		}
+		return string;
 	}
 
 };
 
 
-window.PNGDriveBitStream = function(uint8Array) {
+window.PNGDriveBitStream = function(uint8array) {
 
-	this.a = uint8Array;
+	this.a = uint8array;
 	this.position = 0;
 	this.bitsPending = 0;
 

@@ -20,7 +20,7 @@
 	image.src = "images/jquery-1.7.2.min.png";
 	image.onload = function(e) {
 		var pngdrive = new PNGDrive(e.target);
-		eval(TextDecoder('utf-8').decode(pngdrive.getFileByName("jquery-1.7.2.min.js").content));
+		eval(pngdrive.utf8Decode(pngdrive.getFileByName("jquery-1.7.2.min.js").content));
 		doStuff();
 	}
 

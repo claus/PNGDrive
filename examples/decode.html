@@ -60,7 +60,7 @@ Click an image below:<br>
 		event.preventDefault();
 		var file = pngdrive.getFileAt(event.target.dataset["index"]);
 		if(file.type.split("/")[0] == 'text') {
-			contentEl.innerHTML = '<pre>' + TextDecoder('utf-8'). decode(file.content) + '</pre>';
+			contentEl.innerHTML = '<pre>' + pngdrive.utf8Decode(file.content) + '</pre>';
 		}
 	}
 
