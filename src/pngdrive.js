@@ -254,6 +254,9 @@ window.PNGDrive.prototype = {
 		return numBits;
 	},
 
+	// http://www.webtoolkit.info/javascript-base64.html
+	// http://stackoverflow.com/questions/246801/how-can-you-encode-to-base64-using-javascript/6836708
+	// (modified to use typed arrays)
 	utf8Encode: function(string) {
 		var tmparr = [];
 		var len = string.length;
@@ -273,6 +276,9 @@ window.PNGDrive.prototype = {
 		return new Uint8Array(tmparr);
 	},
 
+	// http://www.webtoolkit.info/javascript-base64.html
+	// http://stackoverflow.com/questions/246801/how-can-you-encode-to-base64-using-javascript/6836708
+	// (modified to use typed arrays)
 	utf8Decode: function(uint8array) {
 		var len = uint8array.byteLength;
 		var string = "";
