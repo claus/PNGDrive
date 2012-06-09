@@ -112,7 +112,11 @@ Adds a binary file to the archive.
 
 - `file` (`File`). The file to add.
 
-Adds a file to the archive. This method is typically used with `<input type="file">` elements or the `drop` event. See the [encoding example](#encode) above.
+Adds a file to the archive.
+
+This method is typically used with `<input type="file">` elements or the `drop` event.
+
+See the [encoding example](#encode) above.
 
 ------
 
@@ -148,7 +152,11 @@ Returns the number of files in the archive.
 
 - `index` (Integer).
 
-Returns the file at the specified index.
+Returns an Object describing the file at the specified index, with the following members:
+
+- `name` (String). The file name.
+- `type` (String). The mime type of the file.
+- `content` (`Uint8Array`). The contents of the file.
 
 ------
 
@@ -156,7 +164,11 @@ Returns the file at the specified index.
 
 - `name` (String). The name of the file.
 
-Returns the file with the specified name.
+Returns an Object describing the file with the specified name, with the following members:
+
+- `name` (String). The file name.
+- `type` (String). The mime type of the file.
+- `content` (`Uint8Array`). The contents of the file.
 
 ------
 
@@ -174,6 +186,13 @@ Extracts files from the supplied image.
 		pngdrive.decode(event.target);
 	}
 
+See also:
+
+- [`getFileCount()`](#getfilecount)
+- [`getFileAt(index)`](#getfileatindex)
+- [`getFileByName(name)`](#getfilebynamename)
+- [Decoding example](#decode)
+
 ------
 
 ### `encode(callback)`
@@ -188,6 +207,10 @@ Encodes all files into a binary array in preparation to `createImage()`.
 		var image = this.createImage();
 	});
 
+See also:
+
+- [Encoding example](#encode)
+
 ------
 
 ### `createImage(targetImage, bitsPerColorComponent)`
@@ -199,11 +222,10 @@ Creates a new image with encoded files or, if a target image is supplied, inject
 
 Returns `HTMLCanvasElement`.
 
-	var pngdrive = new PNGDrive();
-	pngdrive.addTextFile("PNGDrive rocks!", "info.txt", "text/plain");
-	pngdrive.encode(function() {
-		var image = this.createImage();
-	});
+See also:
+
+- [`encode(callback)`](#encodecallback)
+- [Encoding example](#encode)
 
 ------
 
@@ -215,6 +237,10 @@ Returns `HTMLCanvasElement`.
 This method can be used in preparation to `createImage()` to compute the maximum capacity of a target image.
 
 Returns number of bits that fit into the target image.
+
+See also:
+
+- [`createImage(targetImage, bitsPerColorComponent)`](#createimagetargetimage-bitspercolorcomponent)
 
 ------
 
