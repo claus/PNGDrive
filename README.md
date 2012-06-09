@@ -9,8 +9,9 @@ http://pngdrive.devinhaus.com/
 ### Steganography
 
 PNGDrive now supports Steganography: Files can be injected into a target bitmap.
-
-[Here is an example of PNGDrive Steganography in action](http://pngdrive.devinhaus.com/examples/decode_steganography.html), showing the Commodore 64 operating system ROMs injected into a Commodore logo with different numbers of bits per color component (2, 4, 6 and 8):
+[Here is an example of PNGDrive Steganography in action](http://pngdrive.devinhaus.com/examples/decode_steganography.html),
+showing the Commodore 64 operating system ROMs injected into a Commodore logo with
+different numbers of bits per color component (2, 4, 6 and 8, from left to right):
 
 ![](https://github.com/MadeInHaus/PNGDrive/raw/master/examples/images/commodore_2bit.png)
 ![](https://github.com/MadeInHaus/PNGDrive/raw/master/examples/images/commodore_4bit.png)
@@ -111,5 +112,4 @@ Example DIR structure:
 
 Claus Wahlers (claus at madeinhaus dot com)
 
-http://madeinhaus.com/
-
+[![Made in HAUS](https://github.com/MadeInHaus/PNGDrive/raw/master/README_LOGO.png "Made in HAUS")](http://madeinhaus.com/)
