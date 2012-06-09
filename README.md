@@ -73,7 +73,74 @@ http://pngdrive.devinhaus.com/examples/encode_text.html
 
 ## API
 
-Working on it..
+### `PNGDrive(image, bitsPerColorComponent)`
+
+- `image` (`HTMLImageElement` or `HTMLCanvasElement`, *optional*). The image to decode.
+- `bitsPerColorComponent` (Number, *optional*). Valid values: 1-8. Defaults to 8.
+
+Constructor.
+
+	var pngdrive = new PNGDrive();
+
+### `addTextFile(text, name, type)`
+
+- `text` (String). The contents of the file.
+- `name` (String). The file name.
+- `type` (String, *optional*). The mime type of the file.
+
+Adds a text file to the archive.
+
+	pngdrive.addTextFile("PNGDrive rocks!", "info.txt", "text/plain");
+
+### `addBinaryFile(uint8array, name, type)`
+
+- `uint8array` (`Uint8Array`). The contents of the file.
+- `name` (String). The file name.
+- `type` (String, *optional*). The mime type of the file.
+
+Adds a binary file to the archive.
+
+	pngdrive.addBinaryFile(new Uint8Array([0x13, 0x37]), "trash.bin");
+
+### `addFile(file)`
+
+- `file` (`File`). The file to add.
+
+Adds a file to the archive. This method is typically used with `<input type="file">` elements or the `drop` event. See the [encoding example](#encode) above.
+
+### `removeAll()`
+
+Removes all files from the archive.
+
+### `removeFileAt(index)`
+
+- `index` (Integer).
+
+Removes the file at the specified index from the archive.
+
+### `removeFileByName(name)`
+
+- `name` (String). The name of the file.
+
+Removes the file with the specified name from the archive.
+
+### `getFileCount()`
+
+Returns the number of files in the archive.
+
+### `getFileAt(index)`
+
+- `index` (Integer).
+
+Returns the file at the specified index.
+
+### `getFileByName(name)`
+
+- `name` (String). The name of the file.
+
+Returns the file with the specified name.
+
+
 
 ## How?
 
