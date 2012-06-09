@@ -82,6 +82,8 @@ Constructor.
 
 	var pngdrive = new PNGDrive();
 
+------
+
 ### `addTextFile(text, name, type)`
 
 - `text` (String). The contents of the file.
@@ -91,6 +93,8 @@ Constructor.
 Adds a text file to the archive.
 
 	pngdrive.addTextFile("PNGDrive rocks!", "info.txt", "text/plain");
+
+------
 
 ### `addBinaryFile(uint8array, name, type)`
 
@@ -102,15 +106,21 @@ Adds a binary file to the archive.
 
 	pngdrive.addBinaryFile(new Uint8Array([0x13, 0x37]), "trash.bin");
 
+------
+
 ### `addFile(file)`
 
 - `file` (`File`). The file to add.
 
 Adds a file to the archive. This method is typically used with `<input type="file">` elements or the `drop` event. See the [encoding example](#encode) above.
 
+------
+
 ### `removeAll()`
 
 Removes all files from the archive.
+
+------
 
 ### `removeFileAt(index)`
 
@@ -118,15 +128,21 @@ Removes all files from the archive.
 
 Removes the file at the specified index from the archive.
 
+------
+
 ### `removeFileByName(name)`
 
 - `name` (String). The name of the file.
 
 Removes the file with the specified name from the archive.
 
+------
+
 ### `getFileCount()`
 
 Returns the number of files in the archive.
+
+------
 
 ### `getFileAt(index)`
 
@@ -134,12 +150,87 @@ Returns the number of files in the archive.
 
 Returns the file at the specified index.
 
+------
+
 ### `getFileByName(name)`
 
 - `name` (String). The name of the file.
 
 Returns the file with the specified name.
 
+------
+
+### `decode(image, bitsPerColorComponent)`
+
+- `image` (`HTMLImageElement` or `HTMLCanvasElement`). The image to decode.
+- `bitsPerColorComponent` (Number, *optional*). Valid values: 1-8. Defaults to 8.
+
+Extracts files from the supplied image.
+
+	var pngdrive = new PNGDrive();
+	var image = new Image();
+	image.src = "image.png";
+	image.onload = function(event) {
+		pngdrive.decode(event.target);
+	}
+
+------
+
+### `encode(callback)`
+
+- `callback` (`Function`, *optional*). The callback function to call when PNGDrive is done encoding.
+
+Encodes all files into a binary array in preparation to `createImage()`.
+
+	var pngdrive = new PNGDrive();
+	pngdrive.addTextFile("PNGDrive rocks!", "info.txt", "text/plain");
+	pngdrive.encode(function() {
+		var image = this.createImage();
+	});
+
+------
+
+### `createImage(targetImage, bitsPerColorComponent)`
+
+- `targetImage` (`HTMLImageElement` or `HTMLCanvasElement`, *optional*). An image to inject data into.
+- `bitsPerColorComponent` (Number, *optional*). Valid values: 1-8. Defaults to 8.
+
+Creates a new image with encoded files or, if a target image is supplied, injects encoded files into that image.
+
+Returns `HTMLCanvasElement`.
+
+	var pngdrive = new PNGDrive();
+	pngdrive.addTextFile("PNGDrive rocks!", "info.txt", "text/plain");
+	pngdrive.encode(function() {
+		var image = this.createImage();
+	});
+
+------
+
+### `computeImageCapacity(targetImage, bitsPerColorComponent)`
+
+- `targetImage` (`HTMLImageElement` or `HTMLCanvasElement`). An image to inject data into.
+- `bitsPerColorComponent` (Number, *optional*). Valid values: 1-8. Defaults to 8.
+
+This method can be used in preparation to `createImage()` to compute the maximum capacity of a target image.
+
+Returns number of bits that fit into the target image.
+
+------
+
+### `utfEncode(string)`
+
+- `string` (String). Text to encode.
+
+Returns `Uint8Array` containing the encoded string.
+
+------
+
+### `utfDecode(array)`
+
+- `array` (`Uint8Array`). Array to decode.
+
+Returns the decoded string.
 
 
 ## How?
